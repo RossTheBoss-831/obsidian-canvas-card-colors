@@ -1,0 +1,9 @@
+{
+  "id": "canvas-card-colors",
+  "name": "Canvas Card Colors",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "An expanded, easier color picker for canvas cards and edges: custom palette, recent colors, hex input, eyedropper and keyboard shortcuts.",
+  "author": "Ross Nichols",
+  "isDesktopOnly": false
+}
