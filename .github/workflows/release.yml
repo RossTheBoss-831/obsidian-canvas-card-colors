@@ -1,9 +1,12 @@
 name: Release Obsidian plugin
 
+# Publishes a release whenever main has a manifest.json version that
+# hasn't been released yet. To ship an update: bump "version" in
+# manifest.json (and add it to versions.json), then push to main.
 on:
   push:
-    tags:
-      - "*"
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,18 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check tag matches manifest version
-        run: |
-          v=$(jq -r .version manifest.json)
-          if [ "$v" != "${GITHUB_REF_NAME}" ]; then
-            echo "Tag ${GITHUB_REF_NAME} does not match manifest version $v"; exit 1
-          fi
-
-      - name: Create release
+      - name: Release new version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
-            --title "${GITHUB_REF_NAME}" \
+          v=$(jq -r .version manifest.json)
+          if gh release view "$v" >/dev/null 2>&1; then
+            echo "Release $v already exists; nothing to do."
+            exit 0
+          fi
+          gh release create "$v" \
+            --target "$GITHUB_SHA" \
+            --title "$v" \
             --generate-notes \
             main.js manifest.json styles.css
